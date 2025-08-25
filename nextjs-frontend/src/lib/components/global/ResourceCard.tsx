@@ -1,47 +1,52 @@
+// src/lib/components/global/ResourceCard.tsx
+// Last updated: 26 August 2025, 12:02 AM (AEST)
+// FIX: Corrected the import path for the 'urlFor' function to resolve a build error.
 
-/*
-================================================================================
-| FILE 2 OF 3: The Resource Card Component                                     |
-| ---                                                                          |
-| FILE LOCATION: ./nextjs-frontend/src/lib/components/global/ResourceCard.tsx  |
-|                                                                              |
-| INSTRUCTIONS:                                                                |
-| 1. Create this new file at the path specified above.                         |
-| 2. Copy and paste the code below into this file.                             |
-================================================================================
-*/
-
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 import Image from 'next/image'
 import Link from 'next/link'
-import urlFor from '@/lib/urlFor'
+import { urlFor } from '@/lib/content' // Corrected import path
 import { Download, Link as LinkIcon } from 'lucide-react'
 
 export default function ResourceCard({ resource }: { resource: any }) {
-  const imageUrl = resource.previewImage ? urlFor(resource.previewImage)?.url() : null;
+  const { title, previewImage, resourceType } = resource
 
   return (
-    <Link href={`/resources/${resource.slug}`} className="group block bg-white p-4 rounded-xl border border-slate-200 hover:shadow-lg transition-shadow">
-      <div className="relative w-full aspect-[16/9] overflow-hidden rounded-lg bg-slate-100">
-        {imageUrl && (
-          <Image
-            src={imageUrl}
-            alt={resource.title}
-            layout="fill"
-            objectFit="cover"
-            className="group-hover:scale-105 transition-transform duration-300 ease-in-out"
-          />
-        )}
-        <div className="absolute top-3 right-3 bg-slate-900/50 text-white p-2 rounded-full backdrop-blur-sm">
-          {resource.resourceType === 'download' ? <Download size={16} /> : <LinkIcon size={16} />}
+    <Card className="overflow-hidden border-white/10 bg-neutral-900/50 transition-all hover:border-white/20">
+      <CardHeader className="p-0">
+        <Link href={`/resources/${resource.slug.current}`}>
+          <div className="relative aspect-video w-full">
+            {previewImage ? (
+              <Image
+                src={urlFor(previewImage).width(600).height(338).url()}
+                alt={title}
+                fill
+                className="object-cover"
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center bg-neutral-800">
+                <p className="text-neutral-500">No Image</p>
+              </div>
+            )}
+          </div>
+        </Link>
+      </CardHeader>
+      <CardContent className="p-6">
+        <div className="flex items-center justify-between">
+          <Badge variant="secondary" className="flex items-center gap-2">
+            {resourceType === 'download' ? (
+              <Download className="h-4 w-4" />
+            ) : (
+              <LinkIcon className="h-4 w-4" />
+            )}
+            {resourceType?.charAt(0).toUpperCase() + resourceType?.slice(1)}
+          </Badge>
         </div>
-      </div>
-      <div className="mt-4">
-        <h3 className="text-lg font-semibold text-slate-900">
-          {resource.title}
+        <h3 className="mt-4 font-semibold text-white">
+          <Link href={`/resources/${resource.slug.current}`}>{title}</Link>
         </h3>
-        {/* We can add an excerpt here if needed in the future */}
-      </div>
-    </Link>
+      </CardContent>
+    </Card>
   )
 }
-
