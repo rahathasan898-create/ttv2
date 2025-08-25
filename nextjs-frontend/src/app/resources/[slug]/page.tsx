@@ -1,7 +1,6 @@
-// src/app/resources/[slug]/page.tsx
-// Last updated: 25 August 2025, 11:35 PM (AEST)
-// FIX: Proactively corrected the component's function signature to prevent
-// a build error by properly typing the props.
+// File Path: src/app/resources/[slug]/page.tsx
+// Last updated: 25 August 2025, 11:55 PM (AEST)
+// FIX: Updated component signature to handle props as a Promise.
 
 import Resource from '@/lib/components/global/Resource'
 import { getResourceBySlug } from '@/lib/content'
@@ -9,16 +8,14 @@ import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 
 type Props = {
-  params: { slug: string }
+  params: Promise<{ slug: string }>
 }
 
-// Generate metadata for the page
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const resource = await getResourceBySlug(params.slug)
+  const resolvedParams = await params;
+  const resource = await getResourceBySlug(resolvedParams.slug)
   if (!resource) {
-    return {
-      title: 'Resource Not Found',
-    }
+    return { title: 'Resource Not Found' }
   }
   return {
     title: `${resource.title} | Resources`,
@@ -26,9 +23,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-// The main page component
 export default async function ResourcePage({ params }: Props) {
-  const { slug } = params
+  const { slug } = await params;
   const resource = await getResourceBySlug(slug)
 
   if (!resource) {
