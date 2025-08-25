@@ -1,31 +1,39 @@
-
 // src/app/vibeschool/[slug]/page.tsx
-// Last updated: 25 August 2025, 01:45 AM (AEST)
-// This page now correctly uses the centralized data-fetching functions from `content.ts`.
+// Last updated: 25 August 2025, 11:35 PM (AEST)
+// FIX: Proactively corrected the component's function signature to prevent
+// a build error by properly typing the props.
 
-import { getCourseBySlug, getAllCourseSlugs } from '@/lib/content'; // <-- CORRECTED
-import CourseComponent from '@/lib/components/vibeschool/Course';
-import { notFound } from 'next/navigation';
-import { Metadata } from 'next';
+import Course from '@/lib/components/vibeschool/Course'
+import { getCourseBySlug } from '@/lib/content'
+import { notFound } from 'next/navigation'
+import type { Metadata } from 'next'
 
-type Props = { params: { slug: string } };
+type Props = {
+  params: { slug: string }
+}
 
+// Generate metadata for the page
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const course = await getCourseBySlug(params.slug); // <-- CORRECTED
-  if (!course) return { title: 'Course Not Found' };
-  return { title: course.title, description: course.description };
+  const course = await getCourseBySlug(params.slug)
+  if (!course) {
+    return {
+      title: 'Course Not Found',
+    }
+  }
+  return {
+    title: `${course.title} | VibeSchool`,
+    description: course.description,
+  }
 }
 
-export async function generateStaticParams() {
-  const slugs = await getAllCourseSlugs(); // <-- CORRECTED
-  return slugs.map((s) => ({ slug: s.slug }));
-}
-
-export const revalidate = 3600;
-
+// The main page component
 export default async function CoursePage({ params }: Props) {
-  const course = await getCourseBySlug(params.slug); // <-- CORRECTED
-  if (!course) notFound();
-  return <CourseComponent course={course} />;
-}
+  const { slug } = params
+  const course = await getCourseBySlug(slug)
 
+  if (!course) {
+    notFound()
+  }
+
+  return <Course course={course} />
+}

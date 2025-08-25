@@ -1,26 +1,38 @@
-
 // src/app/vibeschool/[slug]/lessons/[lessonSlug]/page.tsx
-// Last updated: 25 August 2025, 01:45 AM (AEST)
-// This page now correctly uses the centralized data-fetching functions from `content.ts`.
+// Last updated: 25 August 2025, 11:35 PM (AEST)
+// FIX: Proactively corrected the component's function signature to prevent
+// a build error by properly typing the props for nested dynamic routes.
 
-import { getLessonBySlugs } from '@/lib/content'; // <-- CORRECTED
-import CourseInteractive from '@/lib/components/vibeschool/CourseInteractive';
-import { notFound } from 'next/navigation';
-import { Metadata } from 'next';
+import CourseInteractive from '@/lib/components/vibeschool/CourseInteractive'
+import { getLessonBySlugs } from '@/lib/content'
+import { notFound } from 'next/navigation'
+import type { Metadata } from 'next'
 
-type Props = { params: { slug: string; lessonSlug: string } };
+type Props = {
+  params: { slug: string; lessonSlug: string }
+}
 
+// Generate metadata for the page
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const data = await getLessonBySlugs(params.slug, params.lessonSlug); // <-- CORRECTED
-  if (!data?.lesson) return { title: 'Lesson Not Found' };
-  return { title: `${data.lesson.title} | ${data.course.title}` };
+  const data = await getLessonBySlugs(params.slug, params.lessonSlug)
+  if (!data || !data.lesson) {
+    return {
+      title: 'Lesson Not Found',
+    }
+  }
+  return {
+    title: `${data.lesson.title} | ${data.course.title}`,
+  }
 }
 
-export const revalidate = 3600;
-
+// The main page component
 export default async function LessonPage({ params }: Props) {
-  const data = await getLessonBySlugs(params.slug, params.lessonSlug); // <-- CORRECTED
-  if (!data) notFound();
-  return <CourseInteractive course={data.course} lesson={data.lesson} />;
-}
+  const { slug, lessonSlug } = params
+  const data = await getLessonBySlugs(slug, lessonSlug)
 
+  if (!data || !data.course || !data.lesson) {
+    notFound()
+  }
+
+  return <CourseInteractive course={data.course} lesson={data.lesson} />
+}

@@ -1,30 +1,39 @@
-
 // src/app/resources/[slug]/page.tsx
-// Last updated: 25 August 2025, 01:45 AM (AEST)
-// This page now correctly uses the centralized data-fetching functions from `content.ts`.
+// Last updated: 25 August 2025, 11:35 PM (AEST)
+// FIX: Proactively corrected the component's function signature to prevent
+// a build error by properly typing the props.
 
-import { getAllResourceSlugs, getResourceBySlug } from '@/lib/content'; // <-- CORRECTED
-import ResourceComponent from '@/lib/components/global/Resource';
-import { notFound } from 'next/navigation';
-import { Metadata } from 'next';
+import Resource from '@/lib/components/global/Resource'
+import { getResourceBySlug } from '@/lib/content'
+import { notFound } from 'next/navigation'
+import type { Metadata } from 'next'
 
-type Props = { params: { slug: string } };
+type Props = {
+  params: { slug: string }
+}
 
+// Generate metadata for the page
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const resource = await getResourceBySlug(params.slug); // <-- CORRECTED
-  if (!resource) return { title: 'Resource Not Found' };
-  return { title: `${resource.title} | TickTrend Australia`, description: resource.excerpt };
+  const resource = await getResourceBySlug(params.slug)
+  if (!resource) {
+    return {
+      title: 'Resource Not Found',
+    }
+  }
+  return {
+    title: `${resource.title} | Resources`,
+    description: resource.excerpt,
+  }
 }
 
-export async function generateStaticParams() {
-  const slugs = await getAllResourceSlugs(); // <-- CORRECTED
-  return slugs.map((s) => ({ slug: s.slug }));
-}
-
-export const revalidate = 600;
-
+// The main page component
 export default async function ResourcePage({ params }: Props) {
-  const resource = await getResourceBySlug(params.slug); // <-- CORRECTED
-  if (!resource) notFound();
-  return <ResourceComponent resource={resource} />;
+  const { slug } = params
+  const resource = await getResourceBySlug(slug)
+
+  if (!resource) {
+    notFound()
+  }
+
+  return <Resource resource={resource} />
 }

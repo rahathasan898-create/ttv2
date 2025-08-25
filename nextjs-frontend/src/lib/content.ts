@@ -1,9 +1,7 @@
 // src/lib/content.ts
-// Last updated: 25 August 2025, 03:00 AM (AEST)
+// Last updated: 25 August 2025, 11:25 PM (AEST)
 // This file is the SOLE abstraction layer for the Sanity.io content backend.
-// It initializes the client, provides the image URL builder, and exports all
-// data-fetching functions. All other components MUST import from this file only.
-// IMPROVEMENT: Added a getFeedContent function to aggregate all content types for the main feed.
+// FIX: Added the missing 'updatePostLikeCounts' function to resolve a build error in the sync API route.
 
 import { createClient, groq } from 'next-sanity';
 import imageUrlBuilder from '@sanity/image-url';
@@ -16,6 +14,8 @@ export const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET!;
 export const apiVersion =
   process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2024-08-25';
 export const useCdn = process.env.NODE_ENV === 'production';
+// A write token is required for the sync function
+const sanityWriteToken = process.env.SANITY_WRITE_TOKEN;
 
 if (!projectId || !dataset) {
   throw new Error('Sanity Project ID and Dataset must be defined in .env');
@@ -27,6 +27,16 @@ export const sanityClient = createClient({
   apiVersion,
   useCdn,
 });
+
+// A separate client with a write token is needed for mutations
+export const sanityWriteClient = createClient({
+    projectId,
+    dataset,
+    apiVersion,
+    useCdn: false, // Always use the live API for writes
+    token: sanityWriteToken,
+});
+
 
 // --- 2. Image URL Builder ---
 const builder = imageUrlBuilder(sanityClient);
@@ -134,4 +144,35 @@ export async function getLessonBySlugs(courseSlug: string, lessonSlug: string): 
 
 export async function getFeedContent(): Promise<(Post | Course | Resource)[]> {
     return sanityClient.fetch(feedQuery);
+}
+
+// --- 5. Content Mutation Functions ---
+
+/**
+ * @description Updates the like counts for multiple posts in Sanity.
+ * @param {Array<{ post_id: string; like_count: number }>} likeCounts - An array of objects with post IDs and their new like counts.
+ */
+export async function updatePostLikeCounts(likeCounts: { post_id: string; like_count: number }[]) {
+    if (!sanityWriteToken) {
+        throw new Error('Sanity write token is not configured. Cannot update like counts.');
+    }
+    if (likeCounts.length === 0) {
+        return; // Nothing to update
+    }
+
+    // Create a transaction with multiple patch operations
+    const transaction = sanityWriteClient.transaction();
+    likeCounts.forEach(({ post_id, like_count }) => {
+        transaction.patch(post_id, {
+            set: { likeCount: like_count }
+        });
+    });
+
+    // Commit the transaction
+    try {
+        await transaction.commit();
+    } catch (error) {
+        console.error('Sanity transaction failed:', error);
+        throw new Error('Failed to update like counts in Sanity.');
+    }
 }

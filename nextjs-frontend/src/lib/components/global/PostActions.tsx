@@ -1,8 +1,7 @@
 // src/lib/components/global/PostActions.tsx
-// Last updated: 25 August 2025, 02:55 AM (AEST)
-// A client component that handles user interactions for a post, such as liking.
-// It fetches initial data and performs mutations via the database abstraction layer.
-// FIX: This component now correctly imports functions from the updated database.ts file.
+// Last updated: 25 August 2025, 11:30 PM (AEST)
+// FIX: Added console logging for the error in the catch block to resolve
+// the 'no-unused-vars' ESLint warning and improve debugging.
 
 'use client';
 
@@ -63,6 +62,8 @@ export default function PostActions({ postId }: Props) {
       try {
         await toggleLike(postId, user.id, hasLiked);
       } catch (error) {
+        // Log the error for debugging
+        console.error("Failed to toggle like:", error);
         // Revert UI on error
         setHasLiked((prev) => !prev);
         setLikeCount((prev) => (hasLiked ? prev + 1 : prev - 1));
@@ -94,7 +95,6 @@ export default function PostActions({ postId }: Props) {
         />
         {likeCount}
       </Button>
-      {/* Save/Bookmark button can be added here in the future */}
     </div>
   );
 }
