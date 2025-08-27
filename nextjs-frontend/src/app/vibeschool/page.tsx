@@ -1,50 +1,41 @@
+// File: src/app/vibeschool/page.tsx (Update this file)
+// Last updated: 28 August 2024 (AEST)
+// This is the main archive page for the VibeSchool pillar, refactored for
+// design consistency and to include page-specific metadata.
 
-// src/app/vibeschool/page.tsx
-// Last updated: 25 August 2025, 03:00 AM (AEST)
-// This page now uses the centralized `getAllCourses` function and renders the
-// new, rebuilt `CourseCard` component for a consistent, premium UI.
-
-import { getAllCourses } from '@/lib/content';
-import CourseCard from '@/lib/components/global/CourseCard'; // <-- CORRECTED IMPORT
+import { getVibeSchoolCourses } from '@/lib/content';
+import CourseCard from '@/lib/components/global/CourseCard';
 import { Metadata } from 'next';
 
+// Add page-specific metadata for SEO
 export const metadata: Metadata = {
   title: 'VibeSchool | TickTrend Australia',
-  description: 'The Playbook Library. Step-by-step courses to master the creator economy.',
+  description: 'Step-by-step courses and playbooks designed to help you master new creator skills, from editing to monetization.',
 };
 
-export const revalidate = 600;
-
 export default async function VibeSchoolPage() {
-  const courses = await getAllCourses();
+  const courses = await getVibeSchoolCourses();
 
   return (
-    <main className="container mx-auto px-4 py-12 md:py-20">
+    <div className="container mx-auto max-w-7xl px-4 py-12 md:py-16">
       <div className="mb-12 text-center">
-        <h1 className="bg-gradient-to-r from-white to-neutral-400 bg-clip-text text-4xl font-bold tracking-tighter text-transparent md:text-6xl">
+        <h1 className="text-4xl font-extrabold tracking-tight md:text-5xl">
           VibeSchool
         </h1>
-        <p className="mx-auto mt-4 max-w-2xl text-lg text-neutral-400">
-          The Playbook Library. Step-by-step courses to master the creator economy.
+        <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
+          Step-by-step courses and playbooks designed to help you master new
+          creator skills, from editing to monetization.
         </p>
       </div>
 
-      {courses && courses.length > 0 ? (
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {courses.map((course) => (
-            <CourseCard key={course._id} course={course} />
-          ))}
-        </div>
-      ) : (
-        <div className="rounded-2xl border border-dashed border-neutral-800 py-12 text-center">
-          <h2 className="text-2xl font-semibold text-neutral-300">
-            No courses available yet!
-          </h2>
-          <p className="mt-2 text-neutral-500">
-            Our team is working on it. Please check back soon.
-          </p>
-        </div>
-      )}
-    </main>
+      {/* Render a grid of course cards */}
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+        {courses && courses.length > 0 ? (
+          courses.map((course) => <CourseCard key={course._id} course={course} />)
+        ) : (
+          <p>No courses found.</p>
+        )}
+      </div>
+    </div>
   );
 }

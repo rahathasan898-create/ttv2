@@ -1,20 +1,17 @@
+// File: src/app/studio/page.tsx (Update this file)
+// Last updated: 28 August 2025, 3:18 AM (AEST)
+// This file renders the Sanity Studio content management interface.
+// It has been updated to be consistent with the V3 layout and metadata practices.
 
-/*
-================================================================================
-| FILE 2 OF 2: The Main Studio Page File                                       |
-| ---                                                                          |
-| FILE LOCATION: ./nextjs-frontend/src/app/studio/page.tsx                     |
-|                                                                              |
-| INSTRUCTIONS:                                                                |
-| 1. Create the folder and file at the path specified above.                   |
-| 2. Copy and paste the code below into this file.                             |
-================================================================================
-*/
+import { Metadata } from 'next';
+import StudioPageContent from '@/lib/components/studio/StudioPageContent';
 
-import StudioPageContent from '../../lib/components/studio/StudioPageContent'
+// Add page-specific metadata for SEO
+export const metadata: Metadata = {
+  title: 'Creator Studio | TickTrend Australia',
+  description: 'Manage all content for the TickTrend Australia platform.',
+};
 
 export default function StudioPage() {
-  return (
-    <StudioPageContent />
-  )
+  return <StudioPageContent />;
 }

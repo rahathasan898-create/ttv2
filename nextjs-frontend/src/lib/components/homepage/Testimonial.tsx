@@ -1,59 +1,54 @@
-// src/lib/components/homepage/Testimonial.tsx
-// Last updated: 24 August 2025, 02:05 AM (AEST)
-// A component to display a customer testimonial for social proof.
-// NOTE: This component currently uses static data as a placeholder. It will
-// be updated to fetch data dynamically from Sanity.
+// File: src/lib/components/homepage/Testimonial.tsx (Update this file)
+// Last updated: 28 August 2025, 01:44 AM (AEST)
+// The "Social Proof" section of the homepage, designed to build trust
+// and authority with quotes from real creators.
 
-import Image from 'next/image';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Card, CardContent } from '@/components/ui/card';
 
-// This data will be fetched from Sanity in a future step.
-const testimonial = {
-  quote:
-    "TickTrend is the first platform that feels like it was built by actual creators. The trend analysis is a game-changer and has saved me countless hours of guesswork. It's an indispensable part of my workflow now.",
-  author: {
-    name: 'Sarah Dole',
-    title: 'Full-Time Creator & Course Instructor',
-    image: 'https://placehold.co/48x48/171717/FFFFFF?text=SD',
-  },
-};
+const testimonials = [
+    {
+        quote: "TickTrend is the first platform that feels like it was built by actual creators. The trend analysis is a game-changer and has saved me countless hours.",
+        name: "Sarah Dole",
+        title: "Full-Time Creator",
+        image: "https://placehold.co/48x48/E2E8F0/475569?text=SD"
+    },
+    {
+        quote: "The VibeSchool courses are pure gold. I learned more about monetization in one afternoon than I did in a year of trial and error.",
+        name: "Michael Chen",
+        title: "Tech & Gadget Reviewer",
+        image: "https://placehold.co/48x48/E2E8F0/475569?text=MC"
+    }
+];
 
 export default function Testimonial() {
   return (
-    <section className="w-full border-t border-white/10 bg-black py-24 sm:py-32">
+    <section className="w-full bg-background py-24 sm:py-32">
       <div className="container mx-auto px-4">
-        <figure className="mx-auto max-w-4xl text-center">
-          <blockquote className="text-2xl font-medium leading-9 text-white md:text-3xl md:leading-normal">
-            <p>"{testimonial.quote}"</p>
-          </blockquote>
-          <figcaption className="mt-10">
-            <div className="flex items-center justify-center">
-              <Image
-                className="h-12 w-12 rounded-full"
-                src={testimonial.author.image}
-                alt={`Photo of ${testimonial.author.name}`}
-                width={48}
-                height={48}
-              />
-            </div>
-            <div className="mt-4 flex items-center justify-center space-x-3 text-base">
-              <div className="font-semibold text-white">
-                {testimonial.author.name}
-              </div>
-              <svg
-                viewBox="0 0 2 2"
-                width={3}
-                height={3}
-                aria-hidden="true"
-                className="fill-neutral-400"
-              >
-                <circle cx={1} cy={1} r={1} />
-              </svg>
-              <div className="text-neutral-400">
-                {testimonial.author.title}
-              </div>
-            </div>
-          </figcaption>
-        </figure>
+        <div className="mb-12 text-center">
+          <h2 className="text-3xl font-bold tracking-tight">
+            Trusted by Creators Like You
+          </h2>
+        </div>
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+          {testimonials.map((testimonial) => (
+            <Card key={testimonial.name}>
+              <CardContent className="p-8">
+                <p className="mb-6">"{testimonial.quote}"</p>
+                <div className="flex items-center gap-4">
+                  <Avatar>
+                    <AvatarImage src={testimonial.image} alt={testimonial.name} />
+                    <AvatarFallback>{testimonial.name.substring(0, 2)}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="font-semibold">{testimonial.name}</p>
+                    <p className="text-sm text-muted-foreground">{testimonial.title}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
     </section>
   );

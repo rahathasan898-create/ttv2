@@ -1,89 +1,131 @@
-// src/lib/components/global/Post.tsx
-// Last updated: 25 August 2025, 02:50 AM (AEST)
-// Refactored to use shadcn/ui for a premium article layout and includes
-// robust error handling for all data points.
-// FIX: Confirmed component correctly destructures props from the Post type.
-// IMPROVEMENT: Added PostActions, premium ContentGate, and topic badges.
+// File: src/lib/components/global/Post.tsx (Update this file)
+// Last updated: 28 August 2025, 02:55 AM (AEST)
+// This component renders the main content of a blog post. It has been
+// refactored to use a modern, two-column layout on desktop, with a sticky
+// sidebar for metadata and future components like a Table of Contents.
+// It now includes robust handling for missing or optional data.
 
 import Image from 'next/image';
 import { urlFor } from '@/lib/content';
 import { Post as PostType } from '@/types';
 import PortableTextComponent from './PortableTextComponent';
-import GoBackButton from './GoBackButton';
-import PostActions from './PostActions';
-import ContentGate from './ContentGate';
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 
-export default function Post({ post }: { post: PostType }) {
-  // --- Robust Error Handling ---
-  if (!post || !post.title || !post.author) {
-    // Log an error for debugging purposes on the server
-    console.error('Post component received incomplete data:', post);
-    return null; // Don't render the component if essential data is missing
-  }
+type Props = {
+  post: PostType;
+};
 
-  const { _id, title, mainImage, author, publishedAt, body, taxonomy, isPremium } = post;
-  const postImageUrl = mainImage ? urlFor(mainImage).width(1200).height(675).url() : null;
-  const authorImageUrl = author.image ? urlFor(author.image).width(100).height(100).url() : null;
+export default function Post({ post }: Props) {
+  // Safely access mainImage with optional chaining
+  const imageUrl = post?.mainImage ? urlFor(post.mainImage)?.url() : null;
+  
+  // FIX: Correctly access the 'image' property on the author object.
+  // Add robust optional chaining to prevent errors if author or image is missing.
+  const authorImageUrl = post?.author?.image
+    ? urlFor(post.author.image)?.url()
+    : null;
 
-  const PostBody = () => (
-    <div className="prose prose-invert prose-lg mt-8 max-w-none">
-      {body ? <PortableTextComponent value={body} /> : <p>Content is not available.</p>}
-    </div>
-  );
+  // Use optional chaining for dates and provide a fallback to the current date
+  const displayDate = post?.displayDate || post?.publishedAt || new Date().toISOString();
 
   return (
-    <main className="container mx-auto px-4 py-12">
-      <div className="mb-8"><GoBackButton /></div>
-      <Card className="mx-auto max-w-4xl overflow-hidden border-white/10 bg-neutral-900/50">
-        {postImageUrl && (
-          <CardHeader className="p-0">
-            <div className="relative aspect-video w-full">
-              <Image src={postImageUrl} alt={title} fill className="object-cover" />
-            </div>
-          </CardHeader>
-        )}
-        <CardContent className="p-8 md:p-12">
-          <h1 className="text-3xl font-bold tracking-tight text-white sm:text-5xl">{title}</h1>
-          <div className="mt-8 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-4">
-              <Avatar>
-                {authorImageUrl && <AvatarImage src={authorImageUrl} alt={author.name} />}
-                <AvatarFallback>{author.name?.charAt(0) || 'A'}</AvatarFallback>
-              </Avatar>
-              <div>
-                <p className="font-semibold text-neutral-200">{author.name}</p>
-                {publishedAt && (
-                  <p className="text-sm text-neutral-400">
-                    {new Date(publishedAt).toLocaleDateString('en-AU', {
-                      year: 'numeric', month: 'long', day: 'numeric',
-                    })}
-                  </p>
-                )}
-              </div>
-            </div>
-            <PostActions postId={_id} />
+    <article className="container relative mx-auto max-w-7xl px-4 py-12 md:py-16">
+      <div className="mx-auto grid max-w-5xl grid-cols-1 gap-x-12 lg:grid-cols-3">
+        {/* --- Main Content Column --- */}
+        <div className="prose prose-lg dark:prose-invert lg:col-span-2">
+          {/* Post Header */}
+          <div className="mb-8">
+            <h1 className="mb-4 text-4xl font-extrabold tracking-tight md:text-5xl">
+              {post?.title || 'Untitled Post'}
+            </h1>
+            {/* Only render excerpt if it exists */}
+            {post?.excerpt && (
+              <p className="text-lg text-muted-foreground">{post.excerpt}</p>
+            )}
           </div>
-          
-          {isPremium ? (
-            <ContentGate>
-              <PostBody />
-            </ContentGate>
-          ) : (
-            <PostBody />
+
+          {/* Featured Image */}
+          {imageUrl && (
+            <div className="relative mb-8 aspect-video w-full overflow-hidden rounded-xl">
+              <Image
+                src={imageUrl}
+                alt={post?.title || 'Post image'}
+                layout="fill"
+                objectFit="cover"
+                priority
+              />
+            </div>
           )}
 
-        </CardContent>
-        {taxonomy?.topics && taxonomy.topics.length > 0 && (
-            <CardFooter className="flex flex-wrap gap-2 p-8 pt-0 md:p-12 md:pt-0">
-                {taxonomy.topics.map((topic) => (
-                    <Badge key={topic._type} variant="secondary">{topic.title}</Badge>
-                ))}
-            </CardFooter>
-        )}
-      </Card>
-    </main>
+          {/* Post Body */}
+          {post?.body && <PortableTextComponent value={post.body} />}
+        </div>
+
+        {/* --- Sticky Sidebar Column --- */}
+        <aside className="hidden lg:block">
+          <div className="sticky top-24">
+            {/* Author Information - Only render if an author is assigned */}
+            {post?.author && (
+              <div className="mb-8 rounded-lg border bg-card p-6 text-card-foreground">
+                <h3 className="mb-4 text-lg font-semibold">About the Author</h3>
+                <div className="flex items-center gap-4">
+                  <Avatar className="h-14 w-14">
+                    {authorImageUrl && (
+                      <AvatarImage src={authorImageUrl} alt={post.author.name || 'Author'} />
+                    )}
+                    <AvatarFallback>
+                      {post.author.name?.substring(0, 2) || 'A'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="font-bold">{post.author.name || 'Anonymous'}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {/* Placeholder for author title */}
+                      Content Strategist
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Post Metadata */}
+            <div className="space-y-4 rounded-lg border bg-card p-6 text-card-foreground">
+              <div>
+                <h4 className="font-semibold">Published On</h4>
+                <p className="text-sm text-muted-foreground">
+                  {new Date(displayDate).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })}
+                </p>
+              </div>
+              {/* Safely check for topics before mapping */}
+              {post?.taxonomy?.topics && post.taxonomy.topics.length > 0 && (
+                <div>
+                  <h4 className="mb-2 font-semibold">Topics</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {post.taxonomy.topics.map((topic) => (
+                      <Badge key={topic._id} variant="secondary">
+                        {topic.title}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Placeholder for future Table of Contents */}
+            <div className="mt-8 rounded-lg border bg-card p-6 text-card-foreground">
+              <h3 className="mb-4 text-lg font-semibold">In This Article</h3>
+              <p className="text-sm text-muted-foreground">
+                (Table of Contents will be implemented here)
+              </p>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </article>
   );
 }

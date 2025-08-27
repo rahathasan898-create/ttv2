@@ -1,90 +1,74 @@
-// src/lib/components/homepage/FeatureShowcase.tsx
-// Last updated: 25 August 2025, 02:30 AM (AEST)
-// A section that showcases the main features or content pillars of the
-// application, using cards with icons to visually represent each area.
-// FIX: Ensured grid layout is fully responsive across all screen sizes.
+// File: src/lib/components/homepage/FeatureShowcase.tsx (Update this file)
+// Last updated: 28 August 2025, 01:42 AM (AEST)
+// This component showcases the core content pillars (our "Value Proposition")
+// using a modern, visually engaging Bento Grid layout.
 
-import {
-  Newspaper,
-  TrendingUp,
-  GraduationCap,
-  Download,
-  Sparkles,
-} from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
+import { Newspaper, TrendingUp, GraduationCap, Download } from 'lucide-react';
 import Link from 'next/link';
 
 const features = [
   {
-    name: 'PulsePoint',
-    description:
-      'In-depth, strategic content. This is our publication for topic breakdowns and evergreen guides.',
-    icon: Newspaper,
-    href: '/pulsepoint',
-  },
-  {
-    name: 'TrendLab',
-    description:
-      "The real-time intelligence hub. Analyzing what's viral, why it works, and how you can use it.",
+    title: 'TrendLab',
+    description: 'Data-driven analysis of what’s currently viral.',
     icon: TrendingUp,
     href: '/trendlab',
+    className: 'col-span-3 row-span-2 md:col-span-2',
+    background: 'bg-blue-500/10 dark:bg-blue-900/20',
   },
   {
-    name: 'VibeSchool',
-    description:
-      'The structured learning platform. Comprehensive courses that take you from foundation to advanced skills.',
+    title: 'PulsePoint',
+    description: 'In-depth articles and strategic guides.',
+    icon: Newspaper,
+    href: '/pulsepoint',
+    className: 'col-span-3 row-span-1 md:col-span-1',
+    background: 'bg-green-500/10 dark:bg-green-900/20',
+  },
+  {
+    title: 'VibeSchool',
+    description: 'Step-by-step courses to master new skills.',
     icon: GraduationCap,
     href: '/vibeschool',
+    className: 'col-span-3 row-span-1 md:col-span-1',
+    background: 'bg-yellow-500/10 dark:bg-yellow-900/20',
   },
   {
-    name: 'Resources',
-    description:
-      'The Creator Kit. A central library for all downloadable assets, templates, and frameworks.',
+    title: 'Resources',
+    description: 'Downloadable templates and creator kits.',
     icon: Download,
     href: '/resources',
-  },
-  {
-    name: 'Creator Studio',
-    description:
-      'The professional workspace. Your storefront for agency services, evolving into a suite of SaaS tools.',
-    icon: Sparkles,
-    href: '/studio',
+    className: 'col-span-3 row-span-1 md:col-span-2',
+    background: 'bg-purple-500/10 dark:bg-purple-900/20',
   },
 ];
 
 export default function FeatureShowcase() {
   return (
-    <section className="w-full border-t border-white/10 bg-black py-24 sm:py-32">
+    <section className="w-full bg-background py-24 sm:py-32">
       <div className="container mx-auto px-4">
-        <div className="text-center">
-          <h2 className="text-3xl font-bold tracking-tight text-white md:text-4xl">
-            Everything You Need to Grow
+        <div className="mb-12 text-center">
+          <h2 className="text-3xl font-bold tracking-tight">
+            Your Complete Creator Toolkit
           </h2>
-          <p className="mt-4 text-lg leading-8 text-neutral-400">
-            TickTrend provides a single, centralized hub that replaces chaos
-            with clarity.
+          <p className="mt-4 max-w-2xl mx-auto text-muted-foreground">
+            Everything you need to go from idea to viral, all in one place.
           </p>
         </div>
-        <div className="mt-16 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-3 grid-rows-3 gap-4">
           {features.map((feature) => (
-            <Link
-              key={feature.name}
-              href={feature.href}
-              className="group block rounded-2xl border border-white/10 bg-neutral-900/50 p-8 transition-all hover:border-white/20 hover:bg-neutral-900"
-            >
-              <div className="flex items-center gap-x-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-white/10">
-                  <feature.icon
-                    className="h-6 w-6 text-white"
-                    aria-hidden="true"
-                  />
-                </div>
-                <h3 className="text-xl font-semibold leading-7 text-white">
-                  {feature.name}
-                </h3>
-              </div>
-              <p className="mt-5 text-base leading-7 text-neutral-400">
-                {feature.description}
-              </p>
+            <Link href={feature.href} key={feature.title} className={cn('group', feature.className)}>
+              <Card className={cn('h-full w-full overflow-hidden transition-all group-hover:-translate-y-1 group-hover:shadow-xl', feature.background)}>
+                <CardHeader>
+                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
+                    <feature.icon className="h-6 w-6 text-primary" />
+                  </div>
+                  <CardTitle>{feature.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">{feature.description}</p>
+                </CardContent>
+              </Card>
             </Link>
           ))}
         </div>

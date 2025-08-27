@@ -1,31 +1,41 @@
-// src/app/pulsepoint/page.tsx
-// Last updated: 25 August 2025, 12:30 AM (AEST)
-// The main archive page for the PulsePoint content pillar. This component has
-// been refactored to use the generic PillarPage component, simplifying its
-// structure and delegating the rendering logic.
+// File: src/app/pulsepoint/page.tsx (Update this file)
+// Last updated: 28 August 2024 (AEST)
+// This is the main archive page for the PulsePoint pillar. It has been
+// refactored to use a consistent layout and includes page-specific metadata.
 
 import { getPostsByPillar } from '@/lib/content';
-import PillarPage from '@/lib/components/global/PillarPage';
+import ContentCard from '@/lib/components/global/ContentCard';
 import { Metadata } from 'next';
 
+// Add page-specific metadata for SEO
 export const metadata: Metadata = {
   title: 'PulsePoint | TickTrend Australia',
-  description:
-    'The latest TikTok trends, news, and growth insights for the Australian market.',
+  description: 'In-depth articles, creator case studies, and strategic guides to help you grow your audience and build your brand.',
 };
 
-export const revalidate = 600; // Revalidate every 10 minutes
-
 export default async function PulsePointPage() {
-  // Fetch data specifically for this pillar.
   const posts = await getPostsByPillar('pulsepoint');
 
-  // Render the reusable PillarPage component with pillar-specific props.
   return (
-    <PillarPage
-      title="PulsePoint"
-      description="In-depth, strategic content. This is our publication for topic breakdowns and evergreen guides."
-      items={posts}
-    />
+    <div className="container mx-auto max-w-7xl px-4 py-12 md:py-16">
+      <div className="mb-12 text-center">
+        <h1 className="text-4xl font-extrabold tracking-tight md:text-5xl">
+          PulsePoint
+        </h1>
+        <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
+          In-depth articles, creator case studies, and strategic guides to help
+          you grow your audience and build your brand.
+        </p>
+      </div>
+
+      {/* Render a grid of content cards */}
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+        {posts && posts.length > 0 ? (
+          posts.map((post) => <ContentCard key={post._id} content={post} />)
+        ) : (
+          <p>No articles found.</p>
+        )}
+      </div>
+    </div>
   );
 }

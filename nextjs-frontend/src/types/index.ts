@@ -1,91 +1,109 @@
 // src/types/index.ts
-// Last updated: 25 August 2025, 02:30 AM (AEST)
-// This file contains all TypeScript interfaces for the Sanity.io data models.
-// FIX: Added missing properties to the Resource interface to match the data model
-// and prevent destructuring errors in components.
+// Last updated: 28 August 2025, 03:15 AM (AEST)
+// This file contains all the TypeScript interfaces for the data models
+// fetched from Sanity, ensuring type safety across the application.
 
-import type { Image, PortableTextBlock } from 'sanity';
+import { PortableTextBlock } from 'sanity';
 
-// --- Reusable Object Types ---
+// Base type for any Sanity document reference
+export interface SanityReference {
+  _ref: string;
+  _type: string;
+}
+
+// Represents an image asset from Sanity
+export interface SanityImage {
+  _type: 'image';
+  asset: SanityReference;
+}
+
+// Represents a slug from Sanity
 export interface Slug {
   _type: 'slug';
   current: string;
 }
 
+// Represents an Author document
+export interface Author {
+  _id: string;
+  name: string;
+  image?: SanityImage;
+  bio?: string;
+}
+
+// Represents a Topic document
+export interface Topic {
+  _id: string; // FIX: Added missing _id property
+  title: string;
+}
+
+// Represents a Platform document
+export interface Platform {
+  _id: string;
+  title: string;
+}
+
+// Represents the Taxonomy object within a Post or other content type
 export interface Taxonomy {
-  _type: 'taxonomy';
   contentPillars?: string[];
   topics?: Topic[];
   platforms?: Platform[];
 }
 
-// --- Document Types ---
-
-export interface Author {
-  _type: 'author';
-  name: string;
-  image?: Image;
+// Represents the Metrics object within a Post or other content type
+export interface Metrics {
+  likeCount?: number;
+  viewCount?: number;
 }
 
-export interface Topic {
-  _type: 'topic';
-  title: string;
-}
-
-export interface Platform {
-  _type: 'platform';
-  title: string;
-}
-
-export interface Lesson {
-  _id: string;
-  _type: 'lesson';
-  title: string;
-  slug: Slug;
-  body?: PortableTextBlock[];
-  isPreview?: boolean;
-}
-
+// Represents a Post document
 export interface Post {
-  _id:string;
+  _id: string;
   _type: 'post';
   title: string;
   slug: Slug;
-  mainImage?: Image;
+  mainImage?: SanityImage;
   author?: Author;
   publishedAt: string;
-  body?: PortableTextBlock[];
+  updatedAt?: string;
+  displayDate?: string; // FIX: Added missing displayDate property
   excerpt?: string;
+  body?: PortableTextBlock[];
   taxonomy?: Taxonomy;
-  isPremium?: boolean;
+  metrics?: Metrics;
 }
 
+// Represents a Course document
 export interface Course {
   _id: string;
   _type: 'course';
   title: string;
   slug: Slug;
-  coverImage?: Image;
+  coverImage?: SanityImage;
   description?: string;
-  excerpt?: string;
-  taxonomy?: Taxonomy;
-  lessons?: Lesson[];
+  lessons?: (Lesson | Post)[]; // A course can contain lessons or posts
 }
 
+// Represents a Lesson document
+export interface Lesson {
+  _id: string;
+  _type: 'lesson';
+  title: string;
+  slug: Slug;
+  isPreview?: boolean;
+  body?: PortableTextBlock[];
+}
+
+// Represents a Resource document
 export interface Resource {
   _id: string;
   _type: 'resource';
   title: string;
   slug: Slug;
-  previewImage?: Image;
-  excerpt?: string;
-  taxonomy?: Taxonomy;
-  // Added missing properties
-  resourceType: 'download' | 'link';
+  previewImage?: SanityImage;
+  resourceType?: 'download' | 'link';
   downloadLink?: string;
-  linkedPost?: {
-    slug: string;
-  };
+  linkedPost?: Post;
   body?: PortableTextBlock[];
-  accessTier?: 'Free Member' | 'Pro Member';
+  accessTier?: 'Public' | 'Free Member' | 'Premium';
 }
