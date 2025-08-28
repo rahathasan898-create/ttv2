@@ -1,15 +1,15 @@
-// src/app/dashboard/page.tsx
-// Last updated: 25 August 2025, 12:30 AM (AEST)
-// The main dashboard page. This has been updated to use Clerk's server-side
-// authentication helpers (`currentUser`) instead of the removed `next-auth`
-// library, ensuring a single, consistent authentication provider.
+/**
+ * File: src/app/dashboard/page.tsx
+ * Last Modified: 28 August 2025, 11:33 PM (AEST)
+ *
+ * FIX: Removed the unused 'MessageSquare' import to clean up build warnings.
+ */
 
 import { currentUser } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { MessageSquare, BarChart2, Star } from 'lucide-react';
+import { BarChart2, Star } from 'lucide-react'; // Removed MessageSquare
 
-// Card components remain the same as they are for UI purposes.
 const DashboardCard = ({ title, description, href, icon: Icon }: { title: string, description: string, href: string, icon: React.ElementType }) => (
   <Link href={href} className="block p-6 bg-white border border-slate-200 rounded-lg shadow-sm hover:shadow-md transition-shadow">
     <Icon className="h-8 w-8 text-blue-600 mb-3" />
@@ -39,11 +39,8 @@ const CommunityCard = () => (
 
 
 export default async function DashboardPage() {
-  // Use Clerk's `currentUser` to get session info on the server.
   const user = await currentUser();
 
-  // If no user is found, redirect to the sign-in page.
-  // Clerk's middleware will handle this, but this is a good safeguard.
   if (!user) {
     redirect('/sign-in?redirect_url=/dashboard');
   }
@@ -52,7 +49,6 @@ export default async function DashboardPage() {
     <div className="bg-slate-50 min-h-screen">
       <div className="container mx-auto px-4 py-12">
         <h1 className="text-3xl font-bold text-slate-900">
-          {/* Use the user's name from the Clerk session. */}
           Welcome back, {user.firstName || user.username}!
         </h1>
         <p className="mt-2 text-lg text-slate-600">

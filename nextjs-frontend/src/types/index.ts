@@ -1,7 +1,10 @@
-// src/types/index.ts
-// Last updated: 28 August 2025, 03:15 AM (AEST)
-// This file contains all the TypeScript interfaces for the data models
-// fetched from Sanity, ensuring type safety across the application.
+/**
+ * File: src/types/index.ts
+ * Last Modified: 28 August 2025, 11:45 PM (AEST)
+ *
+ * FIX: Added the missing 'excerpt' property to the Resource interface. This resolves
+ * the critical TypeScript error that was causing the Vercel deployment to fail.
+ */
 
 import { PortableTextBlock } from 'sanity';
 
@@ -33,7 +36,7 @@ export interface Author {
 
 // Represents a Topic document
 export interface Topic {
-  _id: string; // FIX: Added missing _id property
+  _id: string;
   title: string;
 }
 
@@ -66,7 +69,7 @@ export interface Post {
   author?: Author;
   publishedAt: string;
   updatedAt?: string;
-  displayDate?: string; // FIX: Added missing displayDate property
+  displayDate?: string;
   excerpt?: string;
   body?: PortableTextBlock[];
   taxonomy?: Taxonomy;
@@ -81,7 +84,7 @@ export interface Course {
   slug: Slug;
   coverImage?: SanityImage;
   description?: string;
-  lessons?: (Lesson | Post)[]; // A course can contain lessons or posts
+  lessons?: (Lesson | Post)[];
 }
 
 // Represents a Lesson document
@@ -106,4 +109,5 @@ export interface Resource {
   linkedPost?: Post;
   body?: PortableTextBlock[];
   accessTier?: 'Public' | 'Free Member' | 'Premium';
+  excerpt?: string; // <-- This is the fix
 }
