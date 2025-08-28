@@ -1,13 +1,16 @@
-// File: src/lib/components/global/ContentCard.tsx (Update this file)
-// Last updated: 28 August 2025, 3:15 AM (AEST)
-// This component displays a preview of a single piece of content, like a blog post.
-// It has been refactored to align with the V3 design system, featuring improved
-// styling, theme-awareness, and robust data handling.
+/**
+ * File: src/lib/components/global/ContentCard.tsx
+ * Last Modified: 28 August 2025, 11:55 PM (AEST)
+ *
+ * FIX: Made the component more flexible by accepting either 'content' or 'item' as a prop.
+ * This resolves the TypeScript error across multiple pages (like /feed and /resources)
+ * in a single, efficient change.
+ */
 
 import Image from 'next/image';
 import Link from 'next/link';
 import { urlFor } from '@/lib/content';
-import { Post } from '@/types';
+import { Post } from '@/types'; // Assuming Post, Resource, etc. are compatible
 import {
   Card,
   CardContent,
@@ -17,13 +20,21 @@ import {
 import { Badge } from '@/components/ui/badge';
 
 type Props = {
-  content: Post; // Can be a Post, Trend, etc.
+  content?: Post; // Accept 'content' prop
+  item?: Post;    // OR accept 'item' prop
 };
 
-export default function ContentCard({ content }: Props) {
-  // Safely access data with optional chaining
-  const imageUrl = content?.mainImage ? urlFor(content.mainImage)?.url() : null;
-  const linkUrl = `/${content?.taxonomy?.contentPillars?.[0] || 'post'}/${content?.slug?.current || ''}`;
+export default function ContentCard({ content, item }: Props) {
+  // Use whichever prop is provided. This makes the component robust.
+  const data = content || item;
+
+  // If no data is passed, don't render anything.
+  if (!data) {
+    return null;
+  }
+
+  const imageUrl = data?.mainImage ? urlFor(data.mainImage)?.url() : null;
+  const linkUrl = `/${data?.taxonomy?.contentPillars?.[0] || 'post'}/${data?.slug?.current || ''}`;
 
   return (
     <Link href={linkUrl} className="group flex h-full">
@@ -33,7 +44,7 @@ export default function ContentCard({ content }: Props) {
           {imageUrl ? (
             <Image
               src={imageUrl}
-              alt={content?.title || 'Content image'}
+              alt={data?.title || 'Content image'}
               fill
               className="object-cover transition-transform duration-300 group-hover:scale-105"
             />
@@ -47,22 +58,22 @@ export default function ContentCard({ content }: Props) {
         {/* Title & Excerpt */}
         <CardHeader>
           <h3 className="line-clamp-2 font-bold leading-snug">
-            {content?.title || 'Untitled Post'}
+            {data?.title || 'Untitled Post'}
           </h3>
         </CardHeader>
-        {content?.excerpt && (
+        {data?.excerpt && (
           <CardContent className="flex-grow">
             <p className="line-clamp-3 text-sm text-muted-foreground">
-              {content.excerpt}
+              {data.excerpt}
             </p>
           </CardContent>
         )}
 
         {/* Footer with Pillar Badge */}
         <CardFooter>
-          {content?.taxonomy?.contentPillars?.[0] && (
+          {data?.taxonomy?.contentPillars?.[0] && (
             <Badge variant="secondary">
-              {content.taxonomy.contentPillars[0]}
+              {data.taxonomy.contentPillars[0]}
             </Badge>
           )}
         </CardFooter>
