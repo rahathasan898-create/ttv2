@@ -1,7 +1,7 @@
 // src/app/feed/page.tsx
 // Last updated: 25 August 2025, 03:00 AM (AEST)
-// This page now correctly uses the centralized data-fetching function `getFeedContent`
-// from `content.ts`, resolving the previous module import error.
+// FIX: Corrected the prop name passed to ContentCard from 'item' to 'content'
+// to resolve the TypeScript build error.
 
 import { getFeedContent } from '@/lib/content';
 import ContentCard from '@/lib/components/global/ContentCard';
@@ -36,7 +36,7 @@ export default async function FeedPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {feedContent.map((item: any) => (
-              <ContentCard key={item._id} item={item} />
+              <ContentCard key={item._id} content={item} />
             ))}
           </div>
         )}
