@@ -44,6 +44,6 @@ export default function ContentGate({ children, accessTier = 'Free Member' }: Pr
     return <>{children}</>;
   }
 
-  // Otherwise, render the upgrade banner.
+  // Otherwise, render the upgrade banner..
   return <UpgradeBanner />;
 }
