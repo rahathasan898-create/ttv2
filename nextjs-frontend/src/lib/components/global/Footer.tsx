@@ -1,78 +1,122 @@
-// File: src/lib/components/global/Footer.tsx
-// This is the refactored Footer component with the new dark theme styling and added legal links.
-// FIX: Improved navigation layout on mobile to be a single column for better readability.
+/**
+ * File: src/lib/components/global/Footer.tsx
+ * Last Modified: 28 August 2025, 08:02 PM (AEST)
+ *
+ * This component renders the global site footer. It provides essential links for navigation,
+ * legal information, and social media presence.
+ *
+ * V3 Refactor Notes:
+ * - Implemented a professional, multi-column layout as per the V3 roadmap.
+ * - The layout is fully responsive, stacking neatly on mobile devices.
+ * - Link categories ("Product", "Company", "Legal") provide a clear, scannable structure,
+ * improving user experience and providing SEO benefits.
+ * - Social media links are prominently displayed.
+ * - The design is clean, modern, and theme-aware.
+ */
 
-import Image from "next/image";
-import Link from "next/link";
-import { Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
+import Link from 'next/link'
+import { Facebook, Instagram, Linkedin, Twitter, Youtube } from 'lucide-react'
+
+// Define link structures for easy management
+const productLinks = [
+  { href: '/feed', label: 'Feed' },
+  { href: '/pulsepoint', label: 'PulsePoint' },
+  { href: '/vibeschool', label: 'VibeSchool' },
+  { href: '/trendlab', label: 'TrendLab' },
+  { href: '/resources', label: 'Resources' },
+]
+
+const companyLinks = [
+  { href: '/about', label: 'About Us' },
+  { href: '/studio', label: 'Studio' },
+  { href: '/contact', label: 'Contact' },
+]
+
+const legalLinks = [
+  { href: '/terms', label: 'Terms of Service' },
+  { href: '/privacy', label: 'Privacy Policy' },
+]
+
+const socialLinks = [
+  { href: '#', icon: <Twitter className="h-5 w-5" /> },
+  { href: '#', icon: <Instagram className="h-5 w-5" /> },
+  { href: '#', icon: <Linkedin className="h-5 w-5" /> },
+  { href: '#', icon: <Youtube className="h-5 w-5" /> },
+]
 
 export default function Footer() {
-  const socialLinks = [
-    { name: "Facebook", href: "#", icon: Facebook },
-    { name: "Twitter", href: "#", icon: Twitter },
-    { name: "Instagram", href: "#", icon: Instagram },
-    { name: "LinkedIn", href: "#", icon: Linkedin },
-  ];
-
-  const navLinks = [
-    { name: "Feed", href: "/feed" },
-    { name: "PulsePoint", href: "/pulsepoint" },
-    { name: "VibeSchool", href: "/vibeschool" },
-    { name: "TrendLab", href: "/trendlab" },
-    { name: "Resources", href: "/resources" },
-    { name: "Studio", href: "/studio" },
-    // Added legal and informational links
-    { name: "About", href: "/about" },
-    { name: "Privacy", href: "/privacy" },
-    { name: "Terms", href: "/terms" },
-  ];
-
   return (
-    <footer className="bg-black border-t border-slate-800 text-gray-400">
-      <div className="mx-auto max-w-7xl overflow-hidden px-6 py-12 sm:py-16 lg:px-8">
-        <div className="flex flex-col items-center text-center">
-          {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
-            <Image src="/favicon.ico" alt="TickTrend Logo" width={24} height={24} />
-            <span className="font-bold text-white">TickTrend</span>
-          </Link>
-          <p className="mt-4 text-sm leading-6 max-w-md">
-            The #1 TikTok analytics and trend discovery platform for Australian creators and brands. Go from idea to viral, faster.
-          </p>
-        </div>
-
-        {/* Navigation Links */}
-        <nav className="mt-10 flex flex-col items-center gap-y-4 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-x-8" aria-label="Footer">
-          {navLinks.map((item) => (
-            <div key={item.name}>
-              <Link href={item.href} className="text-sm leading-6 hover:text-white">
-                {item.name}
-              </Link>
+    <footer className="border-t">
+      <div className="container mx-auto max-w-screen-2xl px-4 py-12">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
+          {/* Brand & Social Section */}
+          <div className="flex flex-col space-y-4">
+            <Link href="/" className="text-xl font-bold">
+              TickTrend AU
+            </Link>
+            <p className="text-sm text-muted-foreground">
+              The playbook for creator growth in Australia.
+            </p>
+            <div className="flex space-x-4 pt-2">
+              {socialLinks.map((social, index) => (
+                <Link
+                  key={index}
+                  href={social.href}
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {social.icon}
+                  <span className="sr-only">{social.href}</span>
+                </Link>
+              ))}
             </div>
-          ))}
-        </nav>
+          </div>
 
-        {/* Social Links */}
-        <div className="mt-10 flex justify-center space-x-6">
-          {socialLinks.map((item) => (
-            <a 
-              key={item.name} 
-              href={item.href} 
-              className="text-gray-500 hover:text-gray-400"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <span className="sr-only">{item.name}</span>
-              <item.icon className="h-6 w-6" aria-hidden="true" />
-            </a>
-          ))}
+          {/* Link Sections */}
+          <div className="grid grid-cols-2 gap-8 md:col-span-3 md:grid-cols-3">
+            <div className="flex flex-col space-y-4">
+              <h3 className="font-semibold">Product</h3>
+              {productLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+            <div className="flex flex-col space-y-4">
+              <h3 className="font-semibold">Company</h3>
+              {companyLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+            <div className="flex flex-col space-y-4">
+              <h3 className="font-semibold">Legal</h3>
+              {legalLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          </div>
         </div>
 
-        {/* Copyright */}
-        <p className="mt-10 text-center text-xs leading-5">
-          &copy; {new Date().getFullYear()} TickTrend Australia. All rights reserved.
-        </p>
+        {/* Copyright Section */}
+        <div className="mt-12 border-t pt-8 text-center text-sm text-muted-foreground">
+          <p>&copy; {new Date().getFullYear()} TickTrend Australia. All rights reserved.</p>
+        </div>
       </div>
     </footer>
-  );
+  )
 }

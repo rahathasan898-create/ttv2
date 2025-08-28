@@ -1,50 +1,83 @@
-// File: src/lib/components/homepage/HowItWorks.tsx (New File)
-// Last updated: 28 August 2025, 01:43 AM (AEST)
-// This component represents "The Plan" section of the homepage narrative,
-// showing visitors how easy it is to get started.
+/**
+ * File: src/lib/components/homepage/HowItWorks.tsx
+ * Last Modified: 28 August 2025, 09:15 PM (AEST)
+ *
+ * This component renders "The Plan" section of the homepage narrative. Its purpose is to
+ * demystify the process for new users, showing them a simple, clear path to getting value
+ * from the platform.
+ *
+ * V3 Refactor Notes:
+ * - The component has been redesigned to be a clean, 3-step visual guide, aligning with
+ * our V3 roadmap.
+ * - Each step is presented in a card with a number, an icon, a clear title, and a concise
+ * description, making the process easy to understand at a glance.
+ * - The copy is action-oriented and focuses on the user's journey to success.
+ * - The layout is fully responsive, stacking into a vertical flow on mobile devices.
+ */
 
-import { Lightbulb, Target, TrendingUp } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { AppWindow, BarChart, Lightbulb } from 'lucide-react'
 
+// Define the steps for easy management and mapping
 const steps = [
   {
-    icon: Lightbulb,
+    step: 1,
+    title: 'Explore the Feed',
+    description:
+      'Sign up for free and get immediate access to our curated feed of trends, insights, and resources.',
+    icon: <AppWindow className="h-8 w-8" />,
+  },
+  {
+    step: 2,
     title: 'Discover Insights',
-    description: 'Explore our data-driven trend reports and in-depth articles to find your next great idea.',
+    description:
+      'Use TrendLab and PulsePoint to find breakout opportunities and learn the strategies behind them.',
+    icon: <BarChart className="h-8 w-8" />,
   },
   {
-    icon: Target,
-    title: 'Learn Strategies',
-    description: 'Take our step-by-step courses in VibeSchool to master new skills, from editing to monetization.',
+    step: 3,
+    title: 'Apply & Grow',
+    description:
+      'Put your new knowledge into action with VibeSchool courses and downloadable resources to grow your audience.',
+    icon: <Lightbulb className="h-8 w-8" />,
   },
-  {
-    icon: TrendingUp,
-    title: 'Grow Your Audience',
-    description: 'Apply what you’ve learned to create content that resonates and turn your passion into a profession.',
-  },
-];
+]
 
-export function HowItWorks() {
+export default function HowItWorks() {
   return (
-    <section className="w-full bg-muted/50 py-24 sm:py-32">
-      <div className="container mx-auto px-4">
-        <div className="mb-12 text-center">
-          <h2 className="text-3xl font-bold tracking-tight">How It Works</h2>
-          <p className="mt-4 max-w-2xl mx-auto text-muted-foreground">
-            Getting started is simple. Follow our proven path to creator success.
+    <section className="py-20 sm:py-28 bg-muted/50">
+      <div className="container mx-auto max-w-screen-xl">
+        {/* Section Header */}
+        <div className="text-center max-w-2xl mx-auto">
+          <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+            Get Started in 3 Simple Steps
+          </h2>
+          <p className="mt-4 text-lg text-muted-foreground">
+            From sign-up to success, we make growing your audience easy.
           </p>
         </div>
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-          {steps.map((step, index) => (
-            <div key={index} className="text-center">
-              <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                <step.icon className="h-6 w-6" />
-              </div>
-              <h3 className="text-xl font-bold">{step.title}</h3>
-              <p className="mt-2 text-muted-foreground">{step.description}</p>
-            </div>
+
+        {/* Steps Grid */}
+        <div className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-3">
+          {steps.map((step) => (
+            <Card key={step.step} className="text-center">
+              <CardHeader>
+                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
+                  {step.icon}
+                </div>
+              </CardHeader>
+              <CardContent>
+                <h3 className="text-xl font-bold">
+                  <span className="text-primary">Step {step.step}:</span> {step.title}
+                </h3>
+                <p className="mt-2 text-muted-foreground">
+                  {step.description}
+                </p>
+              </CardContent>
+            </Card>
           ))}
         </div>
       </div>
     </section>
-  );
+  )
 }

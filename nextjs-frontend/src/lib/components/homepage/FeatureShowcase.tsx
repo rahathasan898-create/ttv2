@@ -1,72 +1,92 @@
-// File: src/lib/components/homepage/FeatureShowcase.tsx (Update this file)
-// Last updated: 28 August 2025, 01:42 AM (AEST)
-// This component showcases the core content pillars (our "Value Proposition")
-// using a modern, visually engaging Bento Grid layout.
+/**
+ * File: src/lib/components/homepage/FeatureShowcase.tsx
+ * Last Modified: 28 August 2025, 08:55 PM (AEST)
+ *
+ * This component renders the "Value Proposition" section of the homepage. It showcases the
+ * core content pillars of the TickTrend platform in a visually engaging way.
+ *
+ * V3 Refactor Notes:
+ * - The component has been completely redesigned from a simple grid into a modern and
+ * dynamic "Bento Grid" layout, a key part of our V3 roadmap.
+ * - This layout uses a mix of large and small containers to create a strong visual hierarchy,
+ * drawing the user's attention to the most important features.
+ * - The copy for each pillar is now benefit-focused, telling the user what they can achieve
+ * rather than just what the feature is.
+ * - Each grid item is a clickable card that links to the respective pillar page, encouraging exploration.
+ * - The entire component is fully responsive, stacking into a clean single column on mobile.
+ */
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
-import { Newspaper, TrendingUp, GraduationCap, Download } from 'lucide-react';
-import Link from 'next/link';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { ArrowUpRight, BarChart, BookOpen, Bot, Wrench } from 'lucide-react'
+import Link from 'next/link'
 
+// Define the feature data for easy management and mapping
 const features = [
   {
     title: 'TrendLab',
-    description: 'Data-driven analysis of what’s currently viral.',
-    icon: TrendingUp,
+    benefit: 'Uncover Viral Trends',
+    description: 'Leverage our AI to find breakout sounds and hashtags before they go mainstream.',
     href: '/trendlab',
-    className: 'col-span-3 row-span-2 md:col-span-2',
-    background: 'bg-blue-500/10 dark:bg-blue-900/20',
-  },
-  {
-    title: 'PulsePoint',
-    description: 'In-depth articles and strategic guides.',
-    icon: Newspaper,
-    href: '/pulsepoint',
-    className: 'col-span-3 row-span-1 md:col-span-1',
-    background: 'bg-green-500/10 dark:bg-green-900/20',
+    icon: <BarChart className="h-8 w-8" />,
+    className: 'md:col-span-2', // Takes up two columns on medium screens and up
   },
   {
     title: 'VibeSchool',
-    description: 'Step-by-step courses to master new skills.',
-    icon: GraduationCap,
+    benefit: 'Master Creator Skills',
+    description: 'Access step-by-step courses and playbooks from industry experts.',
     href: '/vibeschool',
-    className: 'col-span-3 row-span-1 md:col-span-1',
-    background: 'bg-yellow-500/10 dark:bg-yellow-900/20',
+    icon: <BookOpen className="h-8 w-8" />,
+    className: '',
+  },
+  {
+    title: 'PulsePoint',
+    benefit: 'Read Expert Insights',
+    description: 'In-depth articles and guides on creator strategy and growth.',
+    href: '/pulsepoint',
+    icon: <Bot className="h-8 w-8" />,
+    className: '',
   },
   {
     title: 'Resources',
-    description: 'Downloadable templates and creator kits.',
-    icon: Download,
+    benefit: 'Get Pro Tools',
+    description: 'Downloadable templates, checklists, and tools to streamline your workflow.',
     href: '/resources',
-    className: 'col-span-3 row-span-1 md:col-span-2',
-    background: 'bg-purple-500/10 dark:bg-purple-900/20',
+    icon: <Wrench className="h-8 w-8" />,
+    className: 'md:col-span-2', // Takes up two columns on medium screens and up
   },
-];
+]
 
 export default function FeatureShowcase() {
   return (
-    <section className="w-full bg-background py-24 sm:py-32">
-      <div className="container mx-auto px-4">
-        <div className="mb-12 text-center">
-          <h2 className="text-3xl font-bold tracking-tight">
-            Your Complete Creator Toolkit
+    <section className="py-20 sm:py-28">
+      <div className="container mx-auto max-w-screen-xl">
+        {/* Section Header */}
+        <div className="text-center max-w-2xl mx-auto">
+          <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+            Your All-in-One Creator Toolkit
           </h2>
-          <p className="mt-4 max-w-2xl mx-auto text-muted-foreground">
-            Everything you need to go from idea to viral, all in one place.
+          <p className="mt-4 text-lg text-muted-foreground">
+            Everything you need to build a successful creator business, all in one
+            place.
           </p>
         </div>
-        <div className="grid grid-cols-3 grid-rows-3 gap-4">
+
+        {/* Bento Grid */}
+        <div className="mt-12 grid grid-cols-1 gap-4 md:grid-cols-3 lg:gap-8">
           {features.map((feature) => (
-            <Link href={feature.href} key={feature.title} className={cn('group', feature.className)}>
-              <Card className={cn('h-full w-full overflow-hidden transition-all group-hover:-translate-y-1 group-hover:shadow-xl', feature.background)}>
+            <Link key={feature.title} href={feature.href} className={`group block ${feature.className}`}>
+              <Card className="h-full hover:border-primary/80 transition-all duration-300 hover:shadow-lg">
                 <CardHeader>
-                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                    <feature.icon className="h-6 w-6 text-primary" />
+                  <div className="flex justify-between items-start">
+                    <div className="text-primary">{feature.icon}</div>
+                    <ArrowUpRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
                   </div>
-                  <CardTitle>{feature.title}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-muted-foreground">{feature.description}</p>
+                  <h3 className="text-xl font-bold">{feature.benefit}</h3>
+                  <p className="mt-2 text-muted-foreground">
+                    {feature.description}
+                  </p>
                 </CardContent>
               </Card>
             </Link>
@@ -74,5 +94,5 @@ export default function FeatureShowcase() {
         </div>
       </div>
     </section>
-  );
+  )
 }

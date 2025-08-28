@@ -1,131 +1,140 @@
-// src/lib/components/global/Header.tsx
-// Last updated: 27 August 2025, 11:23 PM (AEST)
-// This is the global Header component, refactored to be fully responsive.
-// It features a data-driven navigation for desktop, a slide-out sheet menu
-// for mobile, and integrates the theme toggle and user authentication controls.
+/**
+ * File: src/lib/components/global/Header.tsx
+ * Last Modified: 28 August 2025, 11:20 PM (AEST)
+ *
+ * This component renders the global site header, providing consistent navigation across the application.
+ * It is designed to be mobile-first, featuring a clean, responsive layout that adapts seamlessly from
+ * small screens to large desktops. It incorporates the Clerk UserButton for authentication state
+ * and a ThemeToggle for light/dark mode switching.
+ *
+ * V3 Refactor Notes:
+ * - Implemented a simplified desktop navigation structure as per the V3 roadmap.
+ * - Content pillar links (PulsePoint, VibeSchool, etc.) are now consolidated under a "Resources" dropdown.
+ * - The mobile navigation is handled by a Sheet component.
+ * - FIX: Corrected the usage of the Next.js Link component with shadcn/ui's NavigationMenuLink.
+ * Reverted to using `legacyBehavior` and `passHref` props to prevent invalid DOM nesting
+ * (<a> inside <a>) and resolve console errors, which is the correct pattern for these components.
+ */
 
-'use client'
-
-import Link from 'next/link'
-import Image from 'next/image'
-import { SignInButton, UserButton } from '@clerk/nextjs'
-import { useAuth } from '@/lib/auth'
-import { cn } from '@/lib/utils'
 import {
   NavigationMenu,
+  NavigationMenuContent,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
+  NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu'
 import { Button } from '@/components/ui/button'
-import { Skeleton } from '@/components/ui/skeleton'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+import { ThemeToggle } from '@/lib/components/global/ThemeToggle'
+import { UserButton } from '@clerk/nextjs'
 import { Menu } from 'lucide-react'
-import { ThemeToggle } from './ThemeToggle'
+import Link from 'next/link'
 import React from 'react'
 
-// Centralized navigation links array (Data-Driven UI)
-const navLinks = [
-  { href: '/feed', label: 'Feed' },
-  { href: '/pulsepoint', label: 'PulsePoint' },
-  { href: '/vibeschool', label: 'VibeSchool' },
-  { href: '/trendlab', label: 'TrendLab' },
-  { href: '/resources', label: 'Resources' },
-  { href: '/studio', label: 'Studio' },
+// Array for the navigation items to keep the component DRY
+const resourceLinks: { title: string; href: string; description: string }[] = [
+  {
+    title: 'PulsePoint',
+    href: '/pulsepoint',
+    description: 'In-depth articles and guides on creator strategy and growth.',
+  },
+  {
+    title: 'VibeSchool',
+    href: '/vibeschool',
+    description: 'Step-by-step courses and playbooks to master TikTok.',
+  },
+  {
+    title: 'TrendLab',
+    href: '/trendlab',
+    description: 'Data-driven analysis of the latest trending sounds and hashtags.',
+  },
+  {
+    title: 'Resources',
+    href: '/resources',
+    description: 'Downloadable templates, checklists, and tools for creators.',
+  },
 ]
 
 export default function Header() {
-  const { isLoaded, isLoggedIn } = useAuth()
-  const [isSheetOpen, setSheetOpen] = React.useState(false)
-
-  const navLinkClass = cn(
-    navigationMenuTriggerStyle(),
-    'bg-transparent hover:bg-accent focus:bg-accent'
-  )
-
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
+    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-16 max-w-screen-2xl items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center space-x-2">
-          <Image
-            src="/favicon.ico"
-            alt="TickTrend Logo"
-            width={24}
-            height={24}
-          />
-          <span className="font-bold">TickTrend</span>
+        <Link href="/" className="mr-6 flex items-center space-x-2">
+          {/* Placeholder for a proper logo component/SVG */}
+          <span className="font-bold sm:inline-block">TickTrend AU</span>
         </Link>
 
         {/* Desktop Navigation */}
         <NavigationMenu className="hidden md:flex">
           <NavigationMenuList>
-            {navLinks.map((link) => (
-              <NavigationMenuItem key={link.href}>
-                <NavigationMenuLink asChild>
-                  <Link href={link.href} className={navLinkClass}>
-                    {link.label}
-                  </Link>
+            <NavigationMenuItem>
+              {/* FIX: Reverted to legacyBehavior and passHref to fix nesting error */}
+              <Link href="/feed" legacyBehavior passHref>
+                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                  Feed
                 </NavigationMenuLink>
-              </NavigationMenuItem>
-            ))}
+              </Link>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <NavigationMenuTrigger>Resources</NavigationMenuTrigger>
+              <NavigationMenuContent>
+                <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
+                  {resourceLinks.map((component) => (
+                    <ListItem
+                      key={component.title}
+                      title={component.title}
+                      href={component.href}
+                    >
+                      {component.description}
+                    </ListItem>
+                  ))}
+                </ul>
+              </NavigationMenuContent>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+               {/* FIX: Reverted to legacyBehavior and passHref to fix nesting error */}
+              <Link href="/studio" legacyBehavior passHref>
+                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                  Studio
+                </NavigationMenuLink>
+              </Link>
+            </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
 
-        <div className="flex items-center gap-2">
-          <ThemeToggle />
-
-          {/* Auth Button / User Menu */}
-          <div className="flex h-10 items-center justify-end">
-            {!isLoaded ? (
-              <Skeleton className="h-8 w-20 rounded-md" />
-            ) : isLoggedIn ? (
-              <UserButton afterSignOutUrl="/" />
-            ) : (
-              <SignInButton mode="modal">
-                <Button>Login</Button>
-              </SignInButton>
-            )}
+        {/* Right side controls */}
+        <div className="flex flex-1 items-center justify-end space-x-4">
+          <div className="hidden md:flex items-center space-x-2">
+            <ThemeToggle />
+            <UserButton afterSignOutUrl="/" />
           </div>
 
           {/* Mobile Navigation */}
           <div className="md:hidden">
-            <Sheet open={isSheetOpen} onOpenChange={setSheetOpen}>
+            <Sheet>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon">
                   <Menu className="h-5 w-5" />
-                  <span className="sr-only">Open Menu</span>
+                  <span className="sr-only">Open menu</span>
                 </Button>
               </SheetTrigger>
               <SheetContent side="left">
-                <div className="flex flex-col gap-4 py-6">
-                  <Link
-                    href="/"
-                    className="flex items-center space-x-2 px-4"
-                    onClick={() => setSheetOpen(false)}
-                  >
-                    <Image
-                      src="/favicon.ico"
-                      alt="TickTrend Logo"
-                      width={24}
-                      height={24}
-                    />
-                    <span className="font-bold">TickTrend</span>
-                  </Link>
-                  <nav className="flex flex-col gap-2">
-                    {navLinks.map((link) => (
-                      <Link
-                        key={link.href}
-                        href={link.href}
-                        className="rounded-md px-4 py-2 text-lg font-medium text-foreground/80 hover:bg-accent"
-                        onClick={() => setSheetOpen(false)}
-                      >
-                        {link.label}
-                      </Link>
-                    ))}
-                  </nav>
-                </div>
+                {/* Mobile Menu Content will be built out here */}
+                <nav className="grid gap-6 text-lg font-medium mt-6">
+                  <Link href="/" className="font-bold text-xl">TickTrend AU</Link>
+                  <Link href="/feed" className="hover:text-foreground/80 transition-colors">Feed</Link>
+                  {resourceLinks.map((link) => (
+                     <Link key={link.href} href={link.href} className="hover:text-foreground/80 transition-colors">{link.title}</Link>
+                  ))}
+                  <Link href="/studio" className="hover:text-foreground/80 transition-colors">Studio</Link>
+                  <div className="absolute bottom-4 left-4 flex items-center space-x-4">
+                    <ThemeToggle />
+                    <UserButton afterSignOutUrl="/" />
+                  </div>
+                </nav>
               </SheetContent>
             </Sheet>
           </div>
@@ -134,3 +143,32 @@ export default function Header() {
     </header>
   )
 }
+
+// Helper component for NavigationMenu items
+const ListItem = React.forwardRef<
+  React.ElementRef<'a'>,
+  React.ComponentPropsWithoutRef<'a'>
+>(({ className, title, children, ...props }, ref) => {
+  return (
+    <li>
+      <NavigationMenuLink asChild>
+        {/* FIX: Use legacyBehavior and passHref on the Link component inside ListItem */}
+        <Link href={props.href || "/"} legacyBehavior passHref>
+            <a
+            ref={ref}
+            className={
+                'block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground'
+            }
+            {...props}
+            >
+            <div className="text-sm font-medium leading-none">{title}</div>
+            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                {children}
+            </p>
+            </a>
+        </Link>
+      </NavigationMenuLink>
+    </li>
+  )
+})
+ListItem.displayName = 'ListItem'

@@ -2,8 +2,7 @@
 // Last updated: 28 August 2024 (AEST)
 // This is the main archive page for the VibeSchool pillar, refactored for
 // design consistency and to include page-specific metadata.
-
-import { getVibeSchoolCourses } from '@/lib/content';
+import { getAllCourses } from '@/lib/content';
 import CourseCard from '@/lib/components/global/CourseCard';
 import { Metadata } from 'next';
 
@@ -14,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default async function VibeSchoolPage() {
-  const courses = await getVibeSchoolCourses();
+  const courses = await getAllCourses ();
 
   return (
     <div className="container mx-auto max-w-7xl px-4 py-12 md:py-16">
