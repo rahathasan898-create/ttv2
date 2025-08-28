@@ -1,16 +1,17 @@
 /**
  * File: src/lib/components/global/ContentCard.tsx
- * Last Modified: 28 August 2025, 11:55 PM (AEST)
+ * Last Modified: 29 August 2025, 12:01 AM (AEST)
  *
- * FIX: Made the component more flexible by accepting either 'content' or 'item' as a prop.
- * This resolves the TypeScript error across multiple pages (like /feed and /resources)
- * in a single, efficient change.
+ * FIX: The component is now fully generic. It accepts a union type of Post,
+ * Resource, or Course, and correctly handles the different property names
+ * (e.g., mainImage, previewImage, coverImage) for each type. This resolves
+ * all TypeScript errors efficiently in one place.
  */
 
 import Image from 'next/image';
 import Link from 'next/link';
 import { urlFor } from '@/lib/content';
-import { Post } from '@/types'; // Assuming Post, Resource, etc. are compatible
+import { Post, Resource, Course } from '@/types'; // Import all content types
 import {
   Card,
   CardContent,
@@ -19,9 +20,12 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
+// Create a union type for any piece of content the card might display
+type ContentItem = Post | Resource | Course;
+
 type Props = {
-  content?: Post; // Accept 'content' prop
-  item?: Post;    // OR accept 'item' prop
+  content?: ContentItem;
+  item?: ContentItem;
 };
 
 export default function ContentCard({ content, item }: Props) {
@@ -33,8 +37,16 @@ export default function ContentCard({ content, item }: Props) {
     return null;
   }
 
-  const imageUrl = data?.mainImage ? urlFor(data.mainImage)?.url() : null;
-  const linkUrl = `/${data?.taxonomy?.contentPillars?.[0] || 'post'}/${data?.slug?.current || ''}`;
+  // Handle different image property names across types
+  const imageSource = (data as Post).mainImage || (data as Resource).previewImage || (data as Course).coverImage;
+  const imageUrl = imageSource ? urlFor(imageSource).url() : null;
+
+  // Handle different excerpt/description property names
+  const excerpt = (data as Post).excerpt || (data as Course).description;
+
+  // Determine the correct link URL based on the content type
+  const pillar = (data as Post).taxonomy?.contentPillars?.[0] || data._type;
+  const linkUrl = `/${pillar}/${data.slug?.current || ''}`;
 
   return (
     <Link href={linkUrl} className="group flex h-full">
@@ -44,7 +56,7 @@ export default function ContentCard({ content, item }: Props) {
           {imageUrl ? (
             <Image
               src={imageUrl}
-              alt={data?.title || 'Content image'}
+              alt={data.title || 'Content image'}
               fill
               className="object-cover transition-transform duration-300 group-hover:scale-105"
             />
@@ -58,22 +70,22 @@ export default function ContentCard({ content, item }: Props) {
         {/* Title & Excerpt */}
         <CardHeader>
           <h3 className="line-clamp-2 font-bold leading-snug">
-            {data?.title || 'Untitled Post'}
+            {data.title || 'Untitled Post'}
           </h3>
         </CardHeader>
-        {data?.excerpt && (
+        {excerpt && (
           <CardContent className="flex-grow">
             <p className="line-clamp-3 text-sm text-muted-foreground">
-              {data.excerpt}
+              {excerpt}
             </p>
           </CardContent>
         )}
 
         {/* Footer with Pillar Badge */}
         <CardFooter>
-          {data?.taxonomy?.contentPillars?.[0] && (
+          {(data as Post).taxonomy?.contentPillars?.[0] && (
             <Badge variant="secondary">
-              {data.taxonomy.contentPillars[0]}
+              {(data as Post).taxonomy?.contentPillars?.[0]}
             </Badge>
           )}
         </CardFooter>
